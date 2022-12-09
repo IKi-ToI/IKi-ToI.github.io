@@ -2,6 +2,17 @@
     font-family: "Comic Sans MS", "Comic Sans", cursive;
 }
 
-#random_image img {
-    width: 50%;
+body {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+#image img {
+    max-width: 100%;
+    mix-blend-mode: hard-light;
+}
+
+.buttons {
+    display: flex;
 }
