@@ -8,12 +8,16 @@ function check_north() {
     //checks if the answer is correct
     if (current_image == 0) {
         is_correct = true;
+        document.body.style.backgroundColor = "green";
     } else if (current_image == 1) {
         is_correct = false;
+        document.body.style.backgroundColor = "red";
     } else if (current_image == 2) {
         is_correct = false;
+        document.body.style.backgroundColor = "red";
     } else {
         is_correct = true;
+        document.body.style.backgroundColor = "green";
     }
     document.getElementById("answer").innerHTML = is_correct
     console.log(is_correct);
@@ -24,14 +28,19 @@ function check_north() {
 function check_south() {
     //checks if the answer is correct
     if (current_image == 0) {
+        document.body.style.backgroundColor = "red";
         is_correct = false;
     } else if (current_image == 1) {
         is_correct = true;
+        document.body.style.backgroundColor = "green";
     } else if (current_image == 2) {
         is_correct = true;
+        document.body.style.backgroundColor = "green";
     } else {
         is_correct = false;
+        document.body.style.backgroundColor = "red";
     }
+
     document.getElementById("answer").innerHTML = is_correct
     console.log(is_correct);
     //sets new image and memorizes the number

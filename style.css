@@ -6,13 +6,21 @@ body {
     display: flex;
     align-items: center;
     flex-direction: column;
+    justify-content: space-around;
 }
 
 #image img {
     max-width: 100%;
-    mix-blend-mode: hard-light;
 }
 
 .buttons {
-    display: flex;
+    padding-bottom: 20px;
+}
+
+.right_button {
+    font-size: 50px;
+}
+
+.left_button {
+    font-size: 50px;
 }
