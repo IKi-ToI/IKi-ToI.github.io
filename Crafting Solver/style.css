@@ -1,0 +1,32 @@
+* {
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+
+body {
+}
+
+#image img {
+    max-width: 100%;
+}
+.player_stats{
+    display: flex;
+    align-items: center;
+    /*flex-direction: row;*/
+    justify-content: flex-start;
+}
+
+.player_stats > div{
+    margin: 10px;
+}
+
+.buttons {
+    padding-bottom: 20px;
+}
+
+.right_button {
+    font-size: 50px;
+}
+
+.left_button {
+    font-size: 50px;
+}

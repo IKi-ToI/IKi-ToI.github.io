@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+    <script src="simulation.js"></script>
+</head>
+
+<body>
+    <h1>FFXIV CRAFTING SOLVER</h1>
+    <a href="../index.html">Crafting solver</a>
+    <div class="player_stats">
+        <div>
+            <label for="progress">Progres 100%</label><br>
+            <input type="number" id="progress" name="progress"><br>
+        </div>
+        <div>
+            <label for="quality">Quality 100%</label><br>
+            <input type="number" id="quality" name="quality"><br>    
+        </div>
+        <div>
+            <button onclick="getPlayerStats()">Save</button>
+        </div>
+        
+    </div>
+    <button onclick="updateLog()">lol</button>
+    <label for="prog">get gud lol</label>
+    <progress id="prog" value="0" max="100"></progress>
+    <div class="log">
+        <button onclick="resetLog()">reset log</button>
+        <p id="logP"></p>
+    </div>
+</body>
