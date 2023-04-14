@@ -14,9 +14,24 @@ body {
     /*flex-direction: row;*/
     justify-content: flex-start;
 }
+.craft_stats{
+    display: flex;
+    align-items: center;
+    /*flex-direction: row;*/
+    justify-content: flex-start;
+}
+.craft_stats > div{
+    margin: 10px;
+}
 
 .player_stats > div{
     margin: 10px;
+}
+
+.craftHUD{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .buttons {

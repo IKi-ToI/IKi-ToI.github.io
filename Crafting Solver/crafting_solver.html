@@ -3,14 +3,16 @@
 <head>
     <link rel="stylesheet" href="style.css">
     <script src="simulation.js"></script>
+    
 </head>
 
 <body>
     <h1>FFXIV CRAFTING SOLVER</h1>
     <a href="../index.html">Crafting solver</a>
+    <!-- PLAYER STATS HUD -->
     <div class="player_stats">
         <div>
-            <label for="progress">Progres 100%</label><br>
+            <label for="progress">Progress 100%</label><br>
             <input type="number" id="progress" name="progress"><br>
         </div>
         <div>
@@ -18,13 +20,55 @@
             <input type="number" id="quality" name="quality"><br>    
         </div>
         <div>
+            <label for="cp">CP</label><br>
+            <input type="number" id="cp" name="cp"><br>    
+        </div>
+
+        <div>
             <button onclick="getPlayerStats()">Save</button>
         </div>
         
     </div>
-    <button onclick="updateLog()">lol</button>
+    <!-- CRAFT STATS HUD -->
+    <div class="craft_stats">
+        <div>
+            <label for="progress">Progress</label><br>
+            <input type="number" id="cprogress" name="cprogress"><br>
+        </div>
+        <div>
+            <label for="quality">Quality</label><br>
+            <input type="number" id="cquality" name="cquality"><br>    
+        </div>
+        <div>
+            <label for="durability">Durability</label><br>
+            <input type="number" id="durability" name="durability"><br>    
+        </div>
+
+        <div>
+            <button onclick="getCraftStats()">Save</button>
+        </div>
+        
+    </div>
+    <button onclick="test()">lol</button>
     <label for="prog">get gud lol</label>
-    <progress id="prog" value="0" max="100"></progress>
+    <!-- CRAFTING HUD -->
+    <div class="craftHUD">
+        <div>
+            <label for="dur">Durabiy</label><br>
+            <label for="dur" id="durabilityLabel">80/80</label><br>
+            <progress id="dur" value="0" max="100"></progress>
+        </div>
+        <div>
+            <label for="prog">Progress</label><br>
+            <progress id="prog" value="0" max="100"></progress>
+            <p1 id="progressLabel">0/0</p1><br>
+            <label for="qual">Quality</label><br>
+            <progress id="qual" value="0" max="100"></progress>
+            <p1 id="qualityLabel">0/0</p1><br>
+            <p1 id="HQLabel">HQ---0%</p1>
+        </div>
+    </div>
+    
     <div class="log">
         <button onclick="resetLog()">reset log</button>
         <p id="logP"></p>
