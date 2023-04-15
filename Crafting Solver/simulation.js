@@ -17,7 +17,9 @@ class Ability {
         this.buff = buff;
     }
     //checks if the Ability is valid
-    useAbility(currentCP, currentDurability, currentProgress, maxProgress) {
+    useAbility(currentCP, currentDurability, currentProgress, maxProgress, craftBuffs) {
+
+        console.log(this.craftBuffs);
         if(currentCP<this.cp){
             return "not enough CP";
         }
@@ -27,7 +29,95 @@ class Ability {
         if(currentProgress>=maxProgress){
             return "craft is already finished";
         }
+        if(Array.isArray(this.condition)){
+            //checks for start
+            if(searchCondition("start") && !this.searchBuffs("start", craftBuffs)){
+                return this.name +" can only be used at the start of the Craft";
+            }
+            //checks for observe
+            if(searchCondition("observe") && !this.searchBuffs("observe", craftBuffs)){
+                return this.name +" can only be used after using observe";
+            }
+            //checks for good condition
+            if(searchCondition("good") && !this.searchBuffs("good", craftBuffs)){
+                return this.name +" can only be used if the condition is 'good'";
+            }
+            //checks for exelent condition
+            if(searchCondition("exelent") && !this.searchBuffs("exelent", craftBuffs)){
+                return this.name +" can only be used if the condition is 'exelent'";
+            }
+            //checks for Waste Not restrictions
+            if(searchCondition("not Waste Not") && this.searchBuffs("waste not", craftBuffs)){
+                return this.name +" can only be used if 'Waste Not (II)' is not active";
+            }
+            //checks for RNG skills (will be left out innitialy)
+            if(searchCondition("RNG")){
+                return this.name +" is and RNG skill and not Supported yet";
+            }
+            //checks for Inner Quiet
+            if(searchCondition("InnerQuiet") && !this.searchBuffs("InnerQuiet", craftBuffs)){
+                return this.name +" can only be used if 'Inner Quiet' is active";
+            }
+
+        } else{
+            
+            if(this.condition!=false){
+                //checks for start
+                console.log("condition need: " + this.condition);
+                if(this.condition.toLowerCase() === "start".toLowerCase() && !this.searchBuffs("start", craftBuffs)){  
+                    return this.name +" can only be used at the start of the Craft";
+                }
+                //checks for observe
+                if(this.condition.toLowerCase() === "observe".toLowerCase() && !this.searchBuffs("observe", craftBuffs)){
+                    return this.name +" can only be used after using observe";
+                }
+                //checks for good condition
+                if(this.condition.toLowerCase() === "good".toLowerCase() && !this.searchBuffs("good", craftBuffs)){
+                    return this.name +" can only be used if the condition is 'good'";
+                }
+                //checks for exelent condition 
+                if(this.condition.toLowerCase() === "exelent".toLowerCase() && !this.searchBuffs("exelent", craftBuffs)){
+                    return this.name +" can only be used if the condition is 'exelent'";
+                }
+                //checks for Waste Not restrictions
+                if(this.condition.toLowerCase() === "not waste not".toLowerCase() && this.searchBuffs("waste not", craftBuffs)){
+                    return this.name +" can only be used if 'Waste Not (II)' is not active";
+                }
+                //checks for RNG skills (will be left out innitialy)
+                if(this.condition.toLowerCase() === "rng".toLowerCase()){
+                    return this.name +" is and RNG skill and not Supported yet";
+                }
+                //checks for Inner Quiet
+                if(this.condition.toLowerCase() === "innerquiet".toLowerCase() && !this.searchBuffs("InnerQuiet", craftBuffs)){
+                    return this.name +" can only be used if 'Inner Quiet' is active";
+                }
+            }
+        }
+
         return true;
+    }
+    
+    // goes through all values in condition and checks if parameter is one of them returns true if true
+    searchCondition(search){
+        for(let i = 0; i<this.condition.length; i++){
+            //checks if condition is empty (empty = false)
+            if(this.condition==false){
+                return false;
+            }
+            if(this.condition[i].toLowerCase() === search.toLowerCase()){
+                return true;
+                
+            }
+        }
+    }
+
+    searchBuffs(search, craftBuffs){
+        for(let j = 0; j < craftBuffs.length; j++){
+            console.log("buffs: "+craftBuffs[j].toLowerCase());
+            if(craftBuffs[j].toLowerCase() === search.toLowerCase()){
+               return true;
+            }
+        }
     }
 
     //updates all parameters of the craft
@@ -118,6 +208,10 @@ function setCraftStats(prog, qual, dura){
     document.getElementById("progressLabel").innerHTML = "0/" + prog;
     document.getElementById("qualityLabel").innerHTML = "0/" + qual;
     document.getElementById("durabilityLabel").innerHTML = dura+ "/" + dura;
+
+    document.getElementById("cprogress").value = prog;
+    document.getElementById("cquality").value = qual;
+    document.getElementById("cdurability").value = dura;
     
 
     //changes Max Value of progress bar
@@ -167,6 +261,12 @@ const final_Appraisal = new Ability("Final Appraisal", 0, 0, 0, 1, false, ["Fina
 const waste_Not_II = new Ability("Waste Not II", 0, 0, 0, 98, false, ["Waste Not", 8]);
 const manipulation = new Ability("Manipulation", 0, 0, 0, 96, false, ["Manipulation", 8]);
 
+const abilities = [delicate_Synthesis, 
+    basic_Synthesis, rapid_Synthesis, muscle_Memory, careful_Synthesis, focused_Synthesis, groundwork, intensive_Synthesis, prudent_Synthesis, 
+    basic_Touch, hasty_Touch, standard_Touch, byregots_Blessing, precise_Touch, prudent_Touch, reflect, preparatory_Touch, trained_Eye, advanced_Touch, trained_Finesse, 
+    masters_Mend, observe, tricks_of_the_Trade, waste_Not, veneration, great_Strides, innovation, final_Appraisal, waste_Not_II, manipulation
+]
+
 
 /*---------------CRAFTING--------------*/
 var craftProgressMax = 1000;
@@ -175,34 +275,33 @@ var craftDurabilityMax = 60;
 var craftProgress = 0;
 var craftQuality = 0;
 var craftDurability = 60;
+var buffs =["start", "observe"];
 //const manipulation = new Ability("Manipulation", 50, 150, 5, 96, false, "Manipulation");
 
 function test(){
     
-    if(manipulation.useAbility(playerCP, craftDurability, craftProgress, craftProgressMax)!=true){
-        updateLog(manipulation.useAbility(playerCP, craftDurability, craftProgress, craftProgressMax));
+    let AID = 5;
+    if(abilities[AID].useAbility(playerCP, craftDurability, craftProgress, craftProgressMax, buffs)!=true){
+        updateLog(abilities[AID].useAbility(playerCP, craftDurability, craftProgress, craftProgressMax, buffs));
         
         updateLog("croft finished?")
     } else{
-        let response = manipulation.updateCraft(playerCP, craftDurability, craftQuality, craftProgress, ['Manipulation']);
+        let response = abilities[AID].updateCraft(playerCP, craftDurability, craftQuality, craftProgress, buffs);
     
         playerCP = response[0];
         craftDurability = response[1];
         craftQuality = response[2];
         craftProgress = response[3];
-
+        updateLog(abilities[AID].name + " used")
         updateLog(response);
     }
-    //let response = manipulation.updateCraft;
-    //let response = manipulation.updateCraft(playerCP, craftDurability, craftQuality, craftProgress, ['Manipulation']);
-    
-    
-
+ 
     updateHUD("prog", craftProgress);
     updateHUD("qual", craftQuality);
     updateHUD("dura", craftDurability);
     updateHUD("cp", playerCP);
 
+    
     console.log(playerCP, craftDurability, craftQuality, craftProgress);
     breakLineLog();
 }
