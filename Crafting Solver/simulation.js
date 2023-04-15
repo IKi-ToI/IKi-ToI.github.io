@@ -18,7 +18,7 @@ class Ability {
     }
     //checks if the Ability is valid
     useAbility(currentCP, currentDurability, currentProgress, maxProgress, craftBuffs) {
-
+        //craft conditions
         console.log(this.craftBuffs);
         if(currentCP<this.cp){
             return "not enough CP";
@@ -29,33 +29,34 @@ class Ability {
         if(currentProgress>=maxProgress){
             return "craft is already finished";
         }
+        //ability spesific conditions
         if(Array.isArray(this.condition)){
             //checks for start
-            if(searchCondition("start") && !this.searchBuffs("start", craftBuffs)){
+            if(this.searchCondition("start") && !this.searchBuffs("start", craftBuffs)){
                 return this.name +" can only be used at the start of the Craft";
             }
             //checks for observe
-            if(searchCondition("observe") && !this.searchBuffs("observe", craftBuffs)){
+            if(this.searchCondition("observe") && !this.searchBuffs("observe", craftBuffs)){
                 return this.name +" can only be used after using observe";
             }
             //checks for good condition
-            if(searchCondition("good") && !this.searchBuffs("good", craftBuffs)){
+            if(this.searchCondition("good") && !this.searchBuffs("good", craftBuffs)){
                 return this.name +" can only be used if the condition is 'good'";
             }
             //checks for exelent condition
-            if(searchCondition("exelent") && !this.searchBuffs("exelent", craftBuffs)){
+            if(this.searchCondition("exelent") && !this.searchBuffs("exelent", craftBuffs)){
                 return this.name +" can only be used if the condition is 'exelent'";
             }
             //checks for Waste Not restrictions
-            if(searchCondition("not Waste Not") && this.searchBuffs("waste not", craftBuffs)){
+            if(this.searchCondition("not Waste Not") && this.searchBuffs("waste not", craftBuffs)){
                 return this.name +" can only be used if 'Waste Not (II)' is not active";
             }
             //checks for RNG skills (will be left out innitialy)
-            if(searchCondition("RNG")){
+            if(this.searchCondition("RNG")){
                 return this.name +" is and RNG skill and not Supported yet";
             }
             //checks for Inner Quiet
-            if(searchCondition("InnerQuiet") && !this.searchBuffs("InnerQuiet", craftBuffs)){
+            if(this.searchCondition("InnerQuiet") && !this.searchBuffs("InnerQuiet", craftBuffs)){
                 return this.name +" can only be used if 'Inner Quiet' is active";
             }
 
@@ -97,42 +98,72 @@ class Ability {
         return true;
     }
     
-    // goes through all values in condition and checks if parameter is one of them returns true if true
+    // goes through all values in condition and checks if parameter is one of them returns true if so
     searchCondition(search){
         for(let i = 0; i<this.condition.length; i++){
             //checks if condition is empty (empty = false)
             if(this.condition==false){
                 return false;
             }
-            if(this.condition[i].toLowerCase() === search.toLowerCase()){
+            if(String(this.condition[i]).toLowerCase() === search.toLowerCase()){
                 return true;
                 
             }
         }
     }
-
+    // goes through all values in CraftBuff and checks if parameter is one of them returns true if so
     searchBuffs(search, craftBuffs){
         for(let j = 0; j < craftBuffs.length; j++){
-            console.log("buffs: "+craftBuffs[j].toLowerCase());
-            if(craftBuffs[j].toLowerCase() === search.toLowerCase()){
-               return true;
+            //console.log("buffs: "+craftBuffs[j][0].toLowerCase());
+            if(craftBuffs[j][0].toLowerCase() === search.toLowerCase()){
+                console.log("found: " + craftBuffs[j][0]);
+                return true;
             }
         }
+        return false;
     }
+    // returns index of value
+    xsearchBuffs(search, craftBuffs){
+        for(let j = 0; j < craftBuffs.length; j++){
+            //console.log("buffs: "+craftBuffs[j][0].toLowerCase());
+            if(craftBuffs[j][0].toLowerCase() === search.toLowerCase()){
+                console.log("found: " + craftBuffs[j][0]);
+                return [true, j];
+            }
+        }
+        return [false, -1];
+    }
+
+    updateBuff(buffIndex, buffs, change){
+        console.log(buffs[buffIndex][1]-change);
+        return buffs[buffIndex][1]-change;
+    }
+
+    
 
     //updates all parameters of the craft
     updateCraft(currentCP, currentDurability, currentQuality, currentProgress, buffs){
         var modifierDurability = 1;
+        var modifierProgress = 1;
         //checks for any modifier Buffs and adjuts
-        for(let i = 0; i < buffs.length; i++){
+        let tempIndex;
 
-            if(String(buffs[i]) === String("Waste Not")){
-
-                modifierDurability = 0.5;
-            }
+        if(this.xsearchBuffs("Muscle Memory", buffs)[0]){
+            tempIndex = this.xsearchBuffs("Muscle Memory", buffs)[1]
+            //modifier
+            modifierProgress = 2;
+            //reduces stack of buff by 1
+            buffs[tempIndex][1] --;
+            //if buff is consumed or out of stacks -> DELETES it
+            if(this.progress > 0 ||  buffs[tempIndex][1] <= 0){  //if it is a progress ability gets rid of the buff
+                buffs.splice(tempIndex);
+            } 
+        }
+        if(this.xsearchBuffs("Waste not", buffs)[0]){
+            modifierDurability = 0.5;
         }
         
-        return [currentCP-this.cp, currentDurability-this.durability*modifierDurability, currentQuality+this.quality, currentProgress+this.progress];
+        return [currentCP-this.cp, currentDurability-this.durability*modifierDurability, currentQuality+this.quality, currentProgress+this.progress*modifierProgress, buffs];
     }
 
 }
@@ -275,12 +306,12 @@ var craftDurabilityMax = 60;
 var craftProgress = 0;
 var craftQuality = 0;
 var craftDurability = 60;
-var buffs =["start", "observe"];
+var buffs =[["start", -1], ["observe", 1], ["waste not", 8], ["Muscle Memory", 5]];
 //const manipulation = new Ability("Manipulation", 50, 150, 5, 96, false, "Manipulation");
 
 function test(){
     
-    let AID = 5;
+    let AID = 9;
     if(abilities[AID].useAbility(playerCP, craftDurability, craftProgress, craftProgressMax, buffs)!=true){
         updateLog(abilities[AID].useAbility(playerCP, craftDurability, craftProgress, craftProgressMax, buffs));
         
@@ -292,7 +323,8 @@ function test(){
         craftDurability = response[1];
         craftQuality = response[2];
         craftProgress = response[3];
-        updateLog(abilities[AID].name + " used")
+        updateLog("current Buffs" + response[4]);
+        updateLog(abilities[AID].name + " used");
         updateLog(response);
     }
  
