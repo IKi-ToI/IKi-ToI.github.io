@@ -9,6 +9,7 @@
 <body>
     <h1>FFXIV CRAFTING SOLVER</h1>
     <a href="../index.html">Crafting solver</a>
+    <button onclick="defaultStats()">debug</button>
     <!-- PLAYER STATS HUD -->
     <div class="player_stats">
         <div>
@@ -54,9 +55,9 @@
     <!-- CRAFTING HUD -->
     <div class="craftHUD">
         <div>
-            <label for="dur">Durabiy</label><br>
-            <label for="dur" id="durabilityLabel">80/80</label><br>
-            <progress id="dur" value="0" max="100"></progress>
+            <label for="dura">Durabiy</label><br>
+            <label for="dura" id="durabilityLabel">80/80</label><br>
+            <progress id="dura" value="0" max="100"></progress>
         </div>
         <div>
             <label for="prog">Progress</label><br>
@@ -66,6 +67,11 @@
             <progress id="qual" value="0" max="100"></progress>
             <p1 id="qualityLabel">0/0</p1><br>
             <p1 id="HQLabel">HQ---0%</p1>
+        </div>
+        <div>
+            <label for="currentCP">Current cp</label>
+            <progress id="currentCP" value="0" max="100"></progress>
+            <p1 id="CPLabel">0/0</p1>
         </div>
     </div>
     

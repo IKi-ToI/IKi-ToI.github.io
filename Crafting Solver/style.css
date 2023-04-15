@@ -34,6 +34,10 @@ body {
     align-items: center;
 }
 
+.craftHUD > div{
+    padding-left: 20px;
+}
+
 .buttons {
     padding-bottom: 20px;
 }
