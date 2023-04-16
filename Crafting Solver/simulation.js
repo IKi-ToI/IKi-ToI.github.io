@@ -5,16 +5,16 @@ class Ability {
     durability;
     cp;
     condition;
-    buff;
+    abuff;
 
-    constructor(name, progress, quality, durability, cp, condition, buff) {
+    constructor(name, progress, quality, durability, cp, condition, abuff) {
         this.name = name;
         this.progress = progress;
         this.quality = quality;
         this.durability = durability;
         this.cp = cp;
         this.condition = condition;
-        this.buff = buff;
+        this.abuff = abuff;
     }
     //checks if the Ability is valid
     useAbility(currentCP, currentDurability, currentProgress, maxProgress, craftBuffs) {
@@ -127,7 +127,7 @@ class Ability {
         for(let j = 0; j < craftBuffs.length; j++){
             //console.log("buffs: "+craftBuffs[j][0].toLowerCase());
             if(craftBuffs[j][0].toLowerCase() === search.toLowerCase()){
-                console.log("found: " + craftBuffs[j][0]);
+                console.log("found buff: " + craftBuffs[j][0]);
                 return [true, j];
             }
         }
@@ -142,25 +142,46 @@ class Ability {
     
 
     //updates all parameters of the craft
-    updateCraft(currentCP, currentDurability, currentQuality, currentProgress, buffs){
+    updateCraft(currentCP, currentDurability, currentQuality, currentProgress, cbuffs){
         var modifierDurability = 1;
         var modifierProgress = 1;
         //checks for any modifier Buffs and adjuts
         let tempIndex;
-
-        if(this.xsearchBuffs("Muscle Memory", buffs)[0]){
-            tempIndex = this.xsearchBuffs("Muscle Memory", buffs)[1]
+        
+        if(this.xsearchBuffs("Muscle Memory", cbuffs)[0]){
+            tempIndex = this.xsearchBuffs("Muscle Memory", cbuffs)[1];
             //modifier
             modifierProgress = 2;
             //reduces stack of buff by 1
-            buffs[tempIndex][1] --;
+            
+            cbuffs[tempIndex][1] --;
             //if buff is consumed or out of stacks -> DELETES it
-            if(this.progress > 0 ||  buffs[tempIndex][1] <= 0){  //if it is a progress ability gets rid of the buff
-                buffs.splice(tempIndex);
+            if(this.progress > 0 ||  cbuffs[tempIndex][1] <= 0){  //if it is a progress ability gets rid of the buff
+                cbuffs.splice(tempIndex);
             } 
         }
-        if(this.xsearchBuffs("Waste not", buffs)[0]){
+
+        if(this.xsearchBuffs("Waste not", cbuffs)[0]){
             modifierDurability = 0.5;
+        }
+
+        //applies buff
+        if(Array.isArray(this.abuff)){
+            
+            for(let i = 0; i < this.abuff.length; i++){
+                
+                if(!Number.isInteger(this.abuff[i]) && this.abuff[i].toLowerCase() === "Muscle Memory".toLowerCase()){
+                    
+                    cbuffs.push([this.abuff[0],this.abuff[1]]);
+                }
+            }
+        }else{
+            if(this.abuff!=false){
+                if(this.abuff.toLowerCase() === "Muscle Memory".toLowerCase()){
+                    cbuffs.push([this.abuff[0],this.abuff[1]]);
+                }
+            }
+            
         }
         
         return [currentCP-this.cp, currentDurability-this.durability*modifierDurability, currentQuality+this.quality, currentProgress+this.progress*modifierProgress, buffs];
@@ -213,7 +234,7 @@ function setPlayerStat(cp){
 function getCraftStats(){
     craftProgressMax = parseInt(document.getElementById("cprogress").value);
     craftQualityMax =  parseInt(document.getElementById("cquality").value);
-    craftDurabilityMax =  parseInt(document.getElementById("durability").value);
+    craftDurabilityMax =  parseInt(document.getElementById("cdurability").value);
     if(craftProgressMax<=0){
         updateLog("progress must be greater then 0");
         return;
@@ -260,7 +281,7 @@ const delicate_Synthesis = new Ability("Delicate Synthesis", playerProgress , pl
 //Progression
 const basic_Synthesis = new Ability("Basic Synthesis", playerProgress * 1.2 , 0, 10, 0, false, false); 
 const rapid_Synthesis = new Ability("Rapid Synthesis", playerProgress * 5 , 0, 10, 0, ["RNG", 0.5], false); 
-const muscle_Memory = new Ability("Muscle Memory", playerProgress * 3 , 0, 10, 6, "start", ["Muscle_Memory", 5]); 
+const muscle_Memory = new Ability("Muscle Memory", playerProgress * 3 , 0, 10, 6, "start", ["Muscle Memory", 5]); 
 const careful_Synthesis = new Ability("Careful Synthesis", playerProgress * 1.8 , 0, 10, 7, false, false); 
 const focused_Synthesis = new Ability("Focused Synthesis", playerProgress * 1.5 , 0, 10, 18, "Observe", false); 
 const groundwork = new Ability("Groundwork", playerProgress * 3.6 , 0, 20, 18, false, false); 
@@ -306,25 +327,23 @@ var craftDurabilityMax = 60;
 var craftProgress = 0;
 var craftQuality = 0;
 var craftDurability = 60;
-var buffs =[["start", -1], ["observe", 1], ["waste not", 8], ["Muscle Memory", 5]];
+var buffs =[["start", -1], ["observe", 1], ["waste not", 8]];
 //const manipulation = new Ability("Manipulation", 50, 150, 5, 96, false, "Manipulation");
 
-function test(){
-    
-    let AID = 9;
-    if(abilities[AID].useAbility(playerCP, craftDurability, craftProgress, craftProgressMax, buffs)!=true){
-        updateLog(abilities[AID].useAbility(playerCP, craftDurability, craftProgress, craftProgressMax, buffs));
+function useAbilityInCraft(abilityID){
+    if(abilities[abilityID].useAbility(playerCP, craftDurability, craftProgress, craftProgressMax, buffs)!=true){
+        updateLog(abilities[abilityID].useAbility(playerCP, craftDurability, craftProgress, craftProgressMax, buffs));
         
         updateLog("croft finished?")
     } else{
-        let response = abilities[AID].updateCraft(playerCP, craftDurability, craftQuality, craftProgress, buffs);
+        let response = abilities[abilityID].updateCraft(playerCP, craftDurability, craftQuality, craftProgress, buffs);
     
         playerCP = response[0];
         craftDurability = response[1];
         craftQuality = response[2];
         craftProgress = response[3];
-        updateLog("current Buffs" + response[4]);
-        updateLog(abilities[AID].name + " used");
+        updateLog("current Buffs: " + response[4]);
+        updateLog(abilities[abilityID].name + " used");
         updateLog(response);
     }
  
@@ -336,6 +355,15 @@ function test(){
     
     console.log(playerCP, craftDurability, craftQuality, craftProgress);
     breakLineLog();
+}
+
+function test(){
+    
+    useAbilityInCraft(3);
+    useAbilityInCraft(9);
+    useAbilityInCraft(1);
+    useAbilityInCraft(3);
+    useAbilityInCraft(3);
 }
 
 
