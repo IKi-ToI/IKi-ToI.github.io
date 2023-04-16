@@ -204,7 +204,7 @@ class Ability {
     
             //only certain condition will delete buff
             if(this.searchCondition("InnerQuiet")){  
-                let byregot = 1 +0.2*cbuffs[tempIndex][1];
+                let byregot = 1 + 0.2*cbuffs[tempIndex][1];
                 modifierQuality = modifierQuality * byregot;
                 cbuffs.splice(tempIndex, 1);
             } 
@@ -235,8 +235,23 @@ class Ability {
             //if buff is consumed or out of stacks -> DELETES it
             if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Veneration", this.abuff)){  //checks if the ability is a buff giver
                 cbuffs.splice(tempIndex, 1);
-            } 
+            }  
         }
+        //Innovation
+        if(this.xsearchBuffs("Innovation", cbuffs)[0]){
+            tempIndex = this.xsearchBuffs("Innovation", cbuffs)[1];
+            //modifier
+            modifierQuality = modifierQuality * 1.5;
+            
+            //reduces stack of buff by 1
+            
+            cbuffs[tempIndex][1] --;
+            //if buff is consumed or out of stacks -> DELETES it
+            if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Innovation", this.abuff)){  //checks if the ability is a buff giver
+                cbuffs.splice(tempIndex, 1);
+            }  
+        }
+
         /*adds stuff / works with Ability buff (abuff)*/
 
         //applies buff
@@ -269,6 +284,10 @@ class Ability {
                 }
                 //Veneration
                 if(!Number.isInteger(this.abuff[i]) && this.abuff[i].toLowerCase() === "Veneration".toLowerCase()){
+                    cbuffs.push([this.abuff[0],this.abuff[1]]);
+                }
+                //Innovation
+                if(!Number.isInteger(this.abuff[i]) && this.abuff[i].toLowerCase() === "Innovation".toLowerCase()){
                     cbuffs.push([this.abuff[0],this.abuff[1]]);
                 }
             }
@@ -385,8 +404,9 @@ function setCraftStats(prog, qual, dura){
 //uhg 0
 let abilities;
 
-const delicate_Synthesis = new Ability("Delicate Synthesis", playerProgress , playerQuality, 10, 32, false, ["InnerQuiet"]); 
+ 
 function setAbilities(){
+    const delicate_Synthesis = new Ability("Delicate Synthesis", playerProgress , playerQuality, 10, 32, false, ["InnerQuiet"]);
     //Progression 1
     const basic_Synthesis = new Ability("Basic Synthesis", playerProgress * 1.2 , 0, 10, 0, false, false); 
     const rapid_Synthesis = new Ability("Rapid Synthesis", playerProgress * 5 , 0, 10, 0, ["RNG", 0.5], false); 
@@ -475,7 +495,7 @@ function test(){
     abilities = setAbilities();
 
     useAbilityInCraft(15);
-    useAbilityInCraft(9);
+    useAbilityInCraft(26);
     useAbilityInCraft(24);
     useAbilityInCraft(0);
     useAbilityInCraft(12);
