@@ -172,6 +172,8 @@ class Ability {
         var modifierDurability = 1;
         var modifierProgress = 1;
         var modifierQuality = 1;
+        var modifierInnerQuiet = 1;
+        var byregot = 1;
 
         //starts craft
         if(this.searchBuffs("start", cbuffs)){
@@ -186,7 +188,7 @@ class Ability {
         if(this.xsearchBuffs("Muscle Memory", cbuffs)[0]){
             tempIndex = this.xsearchBuffs("Muscle Memory", cbuffs)[1];
             //modifier
-            modifierProgress = 2;
+            modifierProgress =+ 1;
             //reduces stack of buff by 1
             
             cbuffs[tempIndex][1] --;
@@ -199,13 +201,13 @@ class Ability {
         if(this.xsearchBuffs("InnerQuiet", cbuffs)[0]){
             tempIndex = this.xsearchBuffs("InnerQuiet", cbuffs)[1];
             //modifier
-            modifierQuality = 1 + 0.1*cbuffs[tempIndex][1];
+            modifierInnerQuiet = 1 + 0.1*cbuffs[tempIndex][1];
 
     
             //only certain condition will delete buff
             if(this.searchCondition("InnerQuiet")){  
-                let byregot = 1 + 0.2*cbuffs[tempIndex][1];
-                modifierQuality = modifierQuality * byregot;
+                byregot = 1+ 0.2*cbuffs[tempIndex][1];
+                //modifierQuality = modifierQuality*byregot;
                 cbuffs.splice(tempIndex, 1);
             } 
         }
@@ -227,7 +229,7 @@ class Ability {
         if(this.xsearchBuffs("Veneration", cbuffs)[0]){
             tempIndex = this.xsearchBuffs("Veneration", cbuffs)[1];
             //modifier
-            modifierProgress = 1.5;
+            modifierProgress += 0.5;
             
             //reduces stack of buff by 1
             
@@ -241,13 +243,27 @@ class Ability {
         if(this.xsearchBuffs("Innovation", cbuffs)[0]){
             tempIndex = this.xsearchBuffs("Innovation", cbuffs)[1];
             //modifier
-            modifierQuality = modifierQuality * 1.5;
+            modifierQuality += 0.5;
             
             //reduces stack of buff by 1
             
             cbuffs[tempIndex][1] --;
             //if buff is consumed or out of stacks -> DELETES it
             if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Innovation", this.abuff)){  //checks if the ability is a buff giver
+                cbuffs.splice(tempIndex, 1);
+            }  
+        }
+        //Great Strides
+        if(this.xsearchBuffs("Great Strides", cbuffs)[0]){
+            tempIndex = this.xsearchBuffs("Great Strides", cbuffs)[1];
+            //modifier
+            modifierQuality += 1;
+            
+            //reduces stack of buff by 1
+            
+            cbuffs[tempIndex][1] --;
+            //if buff is consumed or out of stacks -> DELETES it
+            if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Great Strides", this.abuff) || this.quality>0){  //checks if the ability is a buff giver
                 cbuffs.splice(tempIndex, 1);
             }  
         }
@@ -290,6 +306,10 @@ class Ability {
                 if(!Number.isInteger(this.abuff[i]) && this.abuff[i].toLowerCase() === "Innovation".toLowerCase()){
                     cbuffs.push([this.abuff[0],this.abuff[1]]);
                 }
+                //Great Strides
+                if(!Number.isInteger(this.abuff[i]) && this.abuff[i].toLowerCase() === "Great Strides".toLowerCase()){
+                    cbuffs.push([this.abuff[0],this.abuff[1]]);
+                }
             }
         }else{
             
@@ -304,8 +324,10 @@ class Ability {
             }
             
         }
-        console.log(" currentProgress: ",currentProgress, " quality: ",this.quality, " modifierQuality: ", modifierQuality, " added quality ", this.quality*modifierQuality);
-        return [currentCP-this.cp, currentDurability-this.durability*modifierDurability, currentQuality+Math.floor(this.quality*modifierQuality), currentProgress+this.progress*modifierProgress, buffs];
+
+        //ugly code with the quality modifiers fix it alet pls
+        console.log(" currentProgress: ",currentProgress, " quality: ",this.quality, " modifierQuality: ", modifierQuality, " InnerQuiet Modifier: ", modifierInnerQuiet, " InnerQuiet Modifier: ", byregot, " added quality ", Math.floor(this.quality*modifierQuality*modifierInnerQuiet*byregot));
+        return [currentCP-this.cp, currentDurability-this.durability*modifierDurability, currentQuality+Math.floor(this.quality*modifierQuality*modifierInnerQuiet*byregot), currentProgress+this.progress*modifierProgress, buffs];
     }
 
 }
@@ -497,6 +519,7 @@ function test(){
     useAbilityInCraft(15);
     useAbilityInCraft(26);
     useAbilityInCraft(24);
+    useAbilityInCraft(25);
     useAbilityInCraft(0);
     useAbilityInCraft(12);
     useAbilityInCraft(9);
