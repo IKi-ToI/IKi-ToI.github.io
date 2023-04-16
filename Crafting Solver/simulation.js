@@ -145,6 +145,10 @@ class Ability {
     updateCraft(currentCP, currentDurability, currentQuality, currentProgress, cbuffs){
         var modifierDurability = 1;
         var modifierProgress = 1;
+        //starts craft
+        cbuffs.splice(0, 1);
+
+
         //checks for any modifier Buffs and adjuts
         let tempIndex;
         
@@ -157,7 +161,7 @@ class Ability {
             cbuffs[tempIndex][1] --;
             //if buff is consumed or out of stacks -> DELETES it
             if(this.progress > 0 ||  cbuffs[tempIndex][1] <= 0){  //if it is a progress ability gets rid of the buff
-                cbuffs.splice(tempIndex);
+                cbuffs.splice(tempIndex, 1);
             } 
         }
 
