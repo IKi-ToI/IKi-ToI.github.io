@@ -23,7 +23,7 @@ class Ability {
         if(currentCP<this.cp){
             return "not enough CP";
         }
-        if(currentDurability<=5) {
+        if(currentDurability<5) {
             return "craft is already finished";
         }
         if(currentProgress>=maxProgress){
@@ -145,13 +145,18 @@ class Ability {
     updateCraft(currentCP, currentDurability, currentQuality, currentProgress, cbuffs){
         var modifierDurability = 1;
         var modifierProgress = 1;
+        var modifierQuality = 1;
+
         //starts craft
-        cbuffs.splice(0, 1);
+        if(this.searchBuffs("start", cbuffs)){
+            cbuffs.splice(0, 1);
+        }
+        
 
 
         //checks for any modifier Buffs and adjuts
         let tempIndex;
-        
+        //muscle Memory
         if(this.xsearchBuffs("Muscle Memory", cbuffs)[0]){
             tempIndex = this.xsearchBuffs("Muscle Memory", cbuffs)[1];
             //modifier
@@ -164,6 +169,18 @@ class Ability {
                 cbuffs.splice(tempIndex, 1);
             } 
         }
+        //Inner Quiet
+        if(this.xsearchBuffs("InnerQuiet", cbuffs)[0]){
+            tempIndex = this.xsearchBuffs("InnerQuiet", cbuffs)[1];
+            //modifier
+            modifierQuality = 1 + 0.1*cbuffs[tempIndex][1];
+
+    
+            //only certain condition will delete buff
+            if(this.searchCondition("innerQuiet")){  //if it is a progress ability gets rid of the buff
+                cbuffs.splice(tempIndex, 1);
+            } 
+        }
 
         if(this.xsearchBuffs("Waste not", cbuffs)[0]){
             modifierDurability = 0.5;
@@ -173,22 +190,42 @@ class Ability {
         if(Array.isArray(this.abuff)){
             
             for(let i = 0; i < this.abuff.length; i++){
-                
+                //muscle memory
                 if(!Number.isInteger(this.abuff[i]) && this.abuff[i].toLowerCase() === "Muscle Memory".toLowerCase()){
-                    
                     cbuffs.push([this.abuff[0],this.abuff[1]]);
                 }
+                //Inner Quiet
+                if(!Number.isInteger(this.abuff[i]) && this.abuff[i].toLowerCase() === "InnerQuiet".toLowerCase()){
+                    console.log(this.name);
+                    console.log(this.abuff);
+                    if(this.xsearchBuffs("InnerQuiet",cbuffs)[0]){
+                        if(this.quality>0){
+                    if(cbuffs[this.xsearchBuffs("InnerQuiet",cbuffs)[1]][1] <= 9){
+                        cbuffs[this.xsearchBuffs("InnerQuiet",cbuffs)[1]][1]++;
+                    } 
+                        //cbuffs[this.xsearchBuffs("InnerQuiet",cbuffs)[1]][1] < 9 ? cbuffs[this.xsearchBuffs("InnerQuiet",cbuffs)[1]][1]++ : cbuffs[this.xsearchBuffs("InnerQuiet",cbuffs)[1]][1];
+                        }
+                    }else {
+                        let temp = String(this.abuff[0]);
+                        cbuffs.push([temp,1]);
+                    }
+                } 
             }
         }else{
+            
             if(this.abuff!=false){
-                if(this.abuff.toLowerCase() === "Muscle Memory".toLowerCase()){
-                    cbuffs.push([this.abuff[0],this.abuff[1]]);
+                if(this.xsearchBuffs("InnerQuiet",cbuffs)[0]){
+                    if(this.abuff.toLowerCase() === "Muscle Memory".toLowerCase()){
+                        cbuffs.push([this.abuff[0],this.abuff[1]]);
+                    }
+                }else {
+                    cbuffs.push([this.abuff[0],0]);
                 }
             }
             
         }
-        
-        return [currentCP-this.cp, currentDurability-this.durability*modifierDurability, currentQuality+this.quality, currentProgress+this.progress*modifierProgress, buffs];
+        console.log(" cost",currentProgress, this.progress, modifierQuality);
+        return [currentCP-this.cp, currentDurability-this.durability*modifierDurability, currentQuality+this.quality*modifierQuality, currentProgress+this.progress*modifierProgress, buffs];
     }
 
 }
@@ -279,10 +316,10 @@ function setCraftStats(prog, qual, dura){
 
 
 /*---------------ABILITY--------------*/
-//uhg
+//uhg 0
 const delicate_Synthesis = new Ability("Delicate Synthesis", playerProgress , playerQuality, 10, 32, false, "InnerQuiet"); 
 
-//Progression
+//Progression 1
 const basic_Synthesis = new Ability("Basic Synthesis", playerProgress * 1.2 , 0, 10, 0, false, false); 
 const rapid_Synthesis = new Ability("Rapid Synthesis", playerProgress * 5 , 0, 10, 0, ["RNG", 0.5], false); 
 const muscle_Memory = new Ability("Muscle Memory", playerProgress * 3 , 0, 10, 6, "start", ["Muscle Memory", 5]); 
@@ -292,20 +329,20 @@ const groundwork = new Ability("Groundwork", playerProgress * 3.6 , 0, 20, 18, f
 const intensive_Synthesis = new Ability("Intensive Synthesis", playerProgress * 4 , 0, 10, 6,["good", "exelent"] , false); 
 const prudent_Synthesis = new Ability("Prudent Synthesis", playerProgress * 1.8 , 0, 50, 18, ["not Waste Not"] , false); 
 
-//Quality
-const basic_Touch = new Ability("Basic Touch", 0, playerQuality, 10, 18, false, "InnerQuiet"); 
-const hasty_Touch = new Ability("Hasty Touch", 0, playerQuality, 10, 0, ["RNG", 0.6], "InnerQuiet"); 
-const standard_Touch = new Ability("Standard Touch", 0, playerQuality *1.25, 10, 32, "touch combo1", "InnerQuiet"); 
+//Quality 9
+const basic_Touch = new Ability("Basic Touch", 0, playerQuality, 10, 18, false, ["InnerQuiet"]); 
+const hasty_Touch = new Ability("Hasty Touch", 0, playerQuality, 10, 0, ["RNG", 0.6], ["InnerQuiet"]); 
+const standard_Touch = new Ability("Standard Touch", 0, playerQuality *1.25, 10, 32, "touch combo1", ["InnerQuiet"]); 
 const byregots_Blessing = new Ability("Byregot's Blessing", 0, playerQuality, 10, 24, "InnerQuiet", "RemoveInnerQuiet"); 
 const precise_Touch = new Ability("Precise Touch", 0, playerQuality, 10, 18, ["good", "exelent"], ["InnerQuiet", "InnerQuiet"]); 
-const prudent_Touch = new Ability("Prudent Touch", 0, playerQuality, 5, 25, ["not Waste Not"], "InnerQuiet"); 
+const prudent_Touch = new Ability("Prudent Touch", 0, playerQuality, 5, 25, ["not Waste Not"], ["InnerQuiet"]); 
 const reflect = new Ability("Reflect", 0, playerQuality, 10, 6, "start", ["InnerQuiet", "InnerQuiet"]);
 const preparatory_Touch = new Ability("Preparatory Touch", 0, playerQuality *2, 20, 40, false, ["InnerQuiet", "InnerQuiet"]);
 const trained_Eye = new Ability("Trained Eye", 0, playerQuality *2000000, 10, 250, "Start", "maxQuality");
-const advanced_Touch = new Ability("Advanced Touch", 0, playerQuality *1.5, 10, 46, "touch combo2", "InnerQuiet");
+const advanced_Touch = new Ability("Advanced Touch", 0, playerQuality *1.5, 10, 46, "touch combo2", ["InnerQuiet"]);
 const trained_Finesse = new Ability("Trained Finesse", 0, playerQuality *1.5, 0, 32, "InnerQuiet10", false);
 
-//Buffs
+//Buffs 20
 const masters_Mend = new Ability("Master's Mend", 0, 0, -30, 88, false, false); 
 const observe = new Ability("Observe", 0, 0, 0, 7, false, ["Observe", 1]);
 const tricks_of_the_Trade = new Ability("Tricks of the Trade", 0, 0, 0, -20, ["good", "exelent"], false);
@@ -335,6 +372,7 @@ var buffs =[["start", -1], ["observe", 1], ["waste not", 8]];
 //const manipulation = new Ability("Manipulation", 50, 150, 5, 96, false, "Manipulation");
 
 function useAbilityInCraft(abilityID){
+    console.log("(--------------)")
     if(abilities[abilityID].useAbility(playerCP, craftDurability, craftProgress, craftProgressMax, buffs)!=true){
         updateLog(abilities[abilityID].useAbility(playerCP, craftDurability, craftProgress, craftProgressMax, buffs));
         
@@ -350,7 +388,8 @@ function useAbilityInCraft(abilityID){
         updateLog(abilities[abilityID].name + " used");
         updateLog(response);
     }
- 
+    
+    console.log(craftProgress);
     updateHUD("prog", craftProgress);
     updateHUD("qual", craftQuality);
     updateHUD("dura", craftDurability);
@@ -363,11 +402,13 @@ function useAbilityInCraft(abilityID){
 
 function test(){
     
-    useAbilityInCraft(3);
+    useAbilityInCraft(15);
+    useAbilityInCraft(15);
     useAbilityInCraft(9);
-    useAbilityInCraft(1);
-    useAbilityInCraft(3);
-    useAbilityInCraft(3);
+    useAbilityInCraft(9);
+    useAbilityInCraft(9);
+    useAbilityInCraft(9);
+    
 }
 
 
