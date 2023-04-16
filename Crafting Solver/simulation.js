@@ -16,6 +16,11 @@ class Ability {
         this.condition = condition;
         this.abuff = abuff;
     }
+
+    /*---------------USEABILITY--------------*/
+    /*---------------------------------------*/
+    /*---------------USEABILITY--------------*/
+
     //checks if the Ability is valid
     useAbility(currentCP, currentDurability, currentProgress, maxProgress, craftBuffs) {
         //craft conditions
@@ -97,6 +102,10 @@ class Ability {
 
         return true;
     }
+
+    /*---------------HELP METHODS--------------*/
+    /*-----------------------------------------*/
+    /*---------------HELP METHODS--------------*/
     
     // goes through all values in condition and checks if parameter is one of them returns true if so
     searchCondition(search){
@@ -136,10 +145,13 @@ class Ability {
     }
 
     searchABuff(search, givenBuff){
-        for(let j = 0; j < givenBuff.length; j++){
+        if(!Array.isArray(givenBuff)){
+            return false;
+        }
+        for( let j = 0; j < givenBuff.length; j++){
             //console.log("buffs: "+craftBuffs[j][0].toLowerCase());
-            if(givenBuff[j].toLowerCase() === search.toLowerCase()){
-                //console.log("found buff: " + craftBuffs[j][0]);
+            if(!Number.isInteger(givenBuff[j]) && givenBuff[j].toLowerCase() === search.toLowerCase()){
+                console.log("found buff: " + givenBuff[j]);
                 return true;
             }
         }
@@ -151,7 +163,9 @@ class Ability {
         return buffs[buffIndex][1]-change;
     }
 
-    
+    /*---------------UPDATE CRAFT--------------*/
+    /*-----------------------------------------*/
+    /*---------------UPDATE CRAFT--------------*/
 
     //updates all parameters of the craft
     updateCraft(currentCP, currentDurability, currentQuality, currentProgress, cbuffs){
@@ -164,8 +178,8 @@ class Ability {
             cbuffs.splice(0, 1);
         }
         
-
-
+        
+        /*subtract stuff / works with craft buff (cbuff)*/
         //checks for any modifier Buffs and adjuts
         let tempIndex;
         //muscle Memory
@@ -204,10 +218,26 @@ class Ability {
             
             cbuffs[tempIndex][1] --;
             //if buff is consumed or out of stacks -> DELETES it
-            if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Waste Not", this.abuff)){  //if it is a progress ability gets rid of the buff
+            console.log(this.abuff);
+            if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Waste Not", this.abuff)){  //checks if the ability is a buff giver
                 cbuffs.splice(tempIndex, 1);
             } 
         }
+        //Venration
+        if(this.xsearchBuffs("Veneration", cbuffs)[0]){
+            tempIndex = this.xsearchBuffs("Veneration", cbuffs)[1];
+            //modifier
+            modifierProgress = 1.5;
+            
+            //reduces stack of buff by 1
+            
+            cbuffs[tempIndex][1] --;
+            //if buff is consumed or out of stacks -> DELETES it
+            if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Veneration", this.abuff)){  //checks if the ability is a buff giver
+                cbuffs.splice(tempIndex, 1);
+            } 
+        }
+        /*adds stuff / works with Ability buff (abuff)*/
 
         //applies buff
         if(Array.isArray(this.abuff)){
@@ -237,6 +267,10 @@ class Ability {
                 if(!Number.isInteger(this.abuff[i]) && this.abuff[i].toLowerCase() === "Waste Not".toLowerCase()){
                     cbuffs.push([this.abuff[0],this.abuff[1]]);
                 }
+                //Veneration
+                if(!Number.isInteger(this.abuff[i]) && this.abuff[i].toLowerCase() === "Veneration".toLowerCase()){
+                    cbuffs.push([this.abuff[0],this.abuff[1]]);
+                }
             }
         }else{
             
@@ -256,6 +290,9 @@ class Ability {
     }
 
 }
+
+/*---------------GETTING VALUES--------------*/
+/*-------------------------------------------*/
 /*---------------GETTING VALUES--------------*/
 //get gud
 var playerProgress = 100;
@@ -343,10 +380,12 @@ function setCraftStats(prog, qual, dura){
 
 
 /*---------------ABILITY--------------*/
+/*------------------------------------*/
+/*---------------ABILITY--------------*/
 //uhg 0
 let abilities;
 
-const delicate_Synthesis = new Ability("Delicate Synthesis", playerProgress , playerQuality, 10, 32, false, "InnerQuiet"); 
+const delicate_Synthesis = new Ability("Delicate Synthesis", playerProgress , playerQuality, 10, 32, false, ["InnerQuiet"]); 
 function setAbilities(){
     //Progression 1
     const basic_Synthesis = new Ability("Basic Synthesis", playerProgress * 1.2 , 0, 10, 0, false, false); 
@@ -392,6 +431,8 @@ function setAbilities(){
 }
 
 /*---------------CRAFTING--------------*/
+/*-------------------------------------*/
+/*---------------CRAFTING--------------*/
 var craftProgressMax = 1000;
 var craftQualityMax = 1500;
 var craftDurabilityMax = 60;
@@ -435,8 +476,8 @@ function test(){
 
     useAbilityInCraft(15);
     useAbilityInCraft(9);
-    useAbilityInCraft(23);
-    useAbilityInCraft(9);
+    useAbilityInCraft(24);
+    useAbilityInCraft(0);
     useAbilityInCraft(12);
     useAbilityInCraft(9);
     useAbilityInCraft(12);
@@ -446,6 +487,8 @@ function test(){
 }
 
 
+/*---------------LOG/HUD--------------*/
+/*------------------------------------*/
 /*---------------LOG/HUD--------------*/
 // updates log with the action that happends last
 function updateLog(log){
