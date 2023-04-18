@@ -175,6 +175,7 @@ class Ability {
         var modifierInnerQuiet = 1;
         var byregot = 1;
         var manipulation = 0;
+        var combo = 0;
 
         //starts craft
         if(this.searchBuffs("start", cbuffs)){
@@ -185,6 +186,12 @@ class Ability {
         /*subtract stuff / works with craft buff (cbuff)*/
         //checks for any modifier Buffs and adjuts
         let tempIndex;
+        if(this.condition === ("touch combo1")){
+            combo = (32-18);
+        }
+        if(this.condition === ("touch combo2")){
+            combo = 46-18;
+        }
         //muscle Memory
         if(this.xsearchBuffs("Muscle Memory", cbuffs)[0]){
             tempIndex = this.xsearchBuffs("Muscle Memory", cbuffs)[1];
@@ -366,7 +373,7 @@ class Ability {
 
         //ugly code with the quality modifiers fix it alet pls
         console.log(" currentProgress: ",currentProgress, " quality: ",this.quality, " modifierProgress: ", modifierProgress," added prog ", Math.floor(this.progress*modifierProgress));
-        return [currentCP-this.cp, currentDurability-this.durability*modifierDurability+manipulation, currentQuality+Math.floor(this.quality*modifierQuality*modifierInnerQuiet*byregot), currentProgress+Math.floor(this.progress*modifierProgress), buffs];
+        return [currentCP-(this.cp-combo), currentDurability-this.durability*modifierDurability+manipulation, currentQuality+Math.floor(this.quality*modifierQuality*modifierInnerQuiet*byregot), currentProgress+Math.floor(this.progress*modifierProgress), buffs];
     }
 
 }
@@ -556,7 +563,7 @@ function useAbilityInCraft(abilityID){
 function test(){
     abilities = setAbilities();
 
-    useAbilityInCraft(3);
+   /* useAbilityInCraft(3);
     useAbilityInCraft(29);
     useAbilityInCraft(24);
     useAbilityInCraft(28);
@@ -571,9 +578,11 @@ function test(){
     useAbilityInCraft(25);
     useAbilityInCraft(26);
     useAbilityInCraft(12);
-    useAbilityInCraft(6);
+    useAbilityInCraft(6);*/
 
-    
+    useAbilityInCraft(9);
+    useAbilityInCraft(11);
+    useAbilityInCraft(18);
 }
 
 
