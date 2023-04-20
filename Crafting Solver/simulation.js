@@ -24,7 +24,7 @@ class Ability {
     //checks if the Ability is valid
     useAbility(currentCP, currentDurability, currentProgress, maxProgress, craftBuffs) {
         //craft conditions
-        console.log(this.craftBuffs);
+        //console.log(this.craftBuffs);
         if(currentCP<this.cp){
             return "not enough CP";
         }
@@ -69,7 +69,7 @@ class Ability {
             
             if(this.condition!=false){
                 //checks for start
-                console.log("condition need: " + this.condition);
+                //console.log("condition need: " + this.condition);
                 if(this.condition.toLowerCase() === "start".toLowerCase() && !this.searchBuffs("start", craftBuffs)){  
                     return this.name +" can only be used at the start of the Craft";
                 }
@@ -151,7 +151,7 @@ class Ability {
         for( let j = 0; j < givenBuff.length; j++){
             //console.log("buffs: "+craftBuffs[j][0].toLowerCase());
             if(!Number.isInteger(givenBuff[j]) && givenBuff[j].toLowerCase() === search.toLowerCase()){
-                console.log("found buff: " + givenBuff[j]);
+                //console.log("found buff: " + givenBuff[j]);
                 return true;
             }
         }
@@ -228,7 +228,7 @@ class Ability {
             
             cbuffs[tempIndex][1] --;
             //if buff is consumed or out of stacks -> DELETES it
-            console.log(this.abuff);
+            //console.log(this.abuff);
             if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Waste Not", this.abuff)){  //checks if the ability is a buff giver
                 cbuffs.splice(tempIndex, 1);
             } 
@@ -300,7 +300,7 @@ class Ability {
             
             cbuffs[tempIndex][1] --;
             //if buff is consumed or out of stacks -> DELETES it
-            console.log(this.abuff);
+            //console.log(this.abuff);
             if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Manipulation", this.abuff)){  //checks if the ability is a buff giver
                 cbuffs.splice(tempIndex, 1);
             } 
@@ -318,8 +318,8 @@ class Ability {
                 }
                 //Inner Quiet
                 if(!Number.isInteger(this.abuff[i]) && this.abuff[i].toLowerCase() === "InnerQuiet".toLowerCase()){
-                    console.log(this.name);
-                    console.log(this.abuff);
+                    //console.log(this.name);
+                    //console.log(this.abuff);
                     if(this.xsearchBuffs("InnerQuiet",cbuffs)[0]){
                         if(this.quality>0){
                             if(cbuffs[this.xsearchBuffs("InnerQuiet",cbuffs)[1]][1] <= 9){
@@ -372,7 +372,11 @@ class Ability {
         }
 
         //ugly code with the quality modifiers fix it alet pls
-        console.log(" currentProgress: ",currentProgress, " quality: ",this.quality, " modifierProgress: ", modifierProgress," added prog ", Math.floor(this.progress*modifierProgress));
+        console.log("ability Progress: ",this.progress, "Progress Modifier: ", modifierProgress, "total added Progress: ", Math.floor(this.progress*modifierProgress), "\n",
+                    "ability Quality: ", this.quality, "Quality Sodifiers", modifierQuality, "Inner Quiet modifier: ", modifierInnerQuiet,"total added Quality", Math.floor(this.quality*modifierQuality*modifierInnerQuiet*byregot), "\n",
+                    "ability Durability: ",this.durability, "Durability Modifier", modifierDurability, "manipulation: ", manipulation, "total added Progress", this.durability*modifierDurability+manipulation, "\n",
+                    "ability Cp: ", this.cp);
+        // console.log(" currentProgress: ",currentProgress, " quality: ",this.quality, " modifierProgress: ", modifierProgress," added prog ", Math.floor(this.progress*modifierProgress));
         return [currentCP-(this.cp-combo), currentDurability-this.durability*modifierDurability+manipulation, currentQuality+Math.floor(this.quality*modifierQuality*modifierInnerQuiet*byregot), currentProgress+Math.floor(this.progress*modifierProgress), buffs];
     }
 
@@ -467,11 +471,12 @@ function setCraftStats(prog, qual, dura){
 }
 
 
+
 /*---------------ABILITY--------------*/
 /*------------------------------------*/
 /*---------------ABILITY--------------*/
 //uhg 0
-let abilities;
+let abilities = setAbilities();
 
  
 function setAbilities(){
@@ -549,19 +554,22 @@ function useAbilityInCraft(abilityID){
         updateLog(response);
     }
     
-    console.log(craftProgress);
+    //console.log(craftProgress);
     updateHUD("prog", craftProgress);
     updateHUD("qual", craftQuality);
     updateHUD("dura", craftDurability);
     updateHUD("cp", playerCP);
 
     
-    console.log(playerCP, craftDurability, craftQuality, craftProgress);
+    console.log("CP: ", playerCP,"Durability: ",  craftDurability,"Quality: ", craftQuality,"Progress: ", craftProgress);
     breakLineLog();
 }
 
 function test(){
     abilities = setAbilities();
+    for (let i = 0; i < playerMacroNum.length; i++) {
+        useAbilityInCraft(playerMacroNum[i]);
+    }
 
    /* useAbilityInCraft(3);
     useAbilityInCraft(29);
@@ -580,10 +588,48 @@ function test(){
     useAbilityInCraft(12);
     useAbilityInCraft(6);*/
 
-    useAbilityInCraft(9);
-    useAbilityInCraft(11);
-    useAbilityInCraft(18);
+    // useAbilityInCraft(9);
+    // useAbilityInCraft(11);
+    // useAbilityInCraft(18);
 }
+
+
+/*---------------MACRO--------------*/
+/*----------------------------------*/
+/*---------------MACRO--------------*/
+var playerMacroRaw;
+var playerMacroArr;
+var playerMacroNum = [];
+
+function setMacroAsRotation(){
+    playerMacroRaw = document.getElementById("craftMacro").value;
+    playerMacroArr = playerMacroRaw.split('/')
+    //console.log(playerMacroArr);
+    for (let i = 0; i < playerMacroArr.length; i++) {
+        for (let j = 0; j < abilities.length; j++) {
+            if(playerMacroArr[i].includes(abilities[j].name)){
+                playerMacroNum.push(j);
+            }
+            
+        }
+    }
+
+    for (let i = 0; i < playerMacroNum.length; i++) {
+        if (playerMacroNum[i]== 28) {
+            playerMacroNum.splice(i-1, 1);
+
+        }
+        
+    }
+    //console.log(playerMacroNum);
+    updateLog(playerMacroNum);
+}
+
+function playerMacroToArray(macro){
+    const macroArr = macro.sp
+}
+
+
 
 
 /*---------------LOG/HUD--------------*/
@@ -622,10 +668,6 @@ function updateHUD(bar, updatedValue){
         document.getElementById("currentCP").value = updatedValue;
         document.getElementById("CPLabel").innerHTML = updatedValue + "/" + playerCPMax;
     }
-
-    
-    
-   
 }
 
 /*---------------DEBUG--------------*/

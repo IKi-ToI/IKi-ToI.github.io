@@ -74,7 +74,15 @@
             <p1 id="CPLabel">0/0</p1>
         </div>
     </div>
-    
+    <!-- MACRO -->   
+
+    <div>
+        <label for="craftMacro">Inport FFXIV macro</label><br>
+        <textarea name="macro" id="craftMacro" cols="40" rows="15"></textarea><br>
+        <button onclick="setMacroAsRotation()">import</button>
+    </div>
+
+    <!-- LOG -->
     <div class="log">
         <button onclick="resetLog()">reset log</button>
         <p id="logP"></p>
