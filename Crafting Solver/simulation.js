@@ -176,6 +176,7 @@ class Ability {
         var byregot = 1;
         var manipulation = 0;
         var combo = 0;
+        var exption = false;
 
         //starts craft
         if(this.searchBuffs("start", cbuffs)){
@@ -192,6 +193,28 @@ class Ability {
         if(this.condition === ("touch combo2")){
             combo = 46-18;
         }
+        if(this.searchABuff("Final Appraisal",this.abuff)){
+            exption = true;
+        }
+        	//Final Appraisal
+        if(this.xsearchBuffs("Final Appraisal", cbuffs)[0]){
+            tempIndex = this.xsearchBuffs("Final Appraisal", cbuffs)[1];
+            //modifier
+            if(currentProgress+this.progress*modifierProgress>=maxProgress){
+                modifierProgress = -(currentProgress-maxProgress+1)/this.progress;
+            }
+            
+            //reduces stack of buff by 1
+            
+            cbuffs[tempIndex][1] --;
+            //if buff is consumed or out of stacks -> DELETES it
+            if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Final Appraisal", this.abuff) || this.progress>0){  //checks if the ability is a buff giver
+                cbuffs.splice(tempIndex, 1);
+            }  
+            
+
+        }
+
         //muscle Memory
         if(this.xsearchBuffs("Muscle Memory", cbuffs)[0]){
             tempIndex = this.xsearchBuffs("Muscle Memory", cbuffs)[1];
@@ -199,7 +222,7 @@ class Ability {
             modifierProgress += 1;
             //reduces stack of buff by 1
             
-            cbuffs[tempIndex][1] --;
+            if(!exption){cbuffs[tempIndex][1] --;}
             //if buff is consumed or out of stacks -> DELETES it
             if(this.progress > 0 ||  cbuffs[tempIndex][1] <= 0){  //if it is a progress ability gets rid of the buff
                 cbuffs.splice(tempIndex, 1);
@@ -226,7 +249,7 @@ class Ability {
             modifierDurability = 0.5;
             //reduces stack of buff by 1
             
-            cbuffs[tempIndex][1] --;
+            if(!exption){cbuffs[tempIndex][1] --;}
             //if buff is consumed or out of stacks -> DELETES it
             //console.log(this.abuff);
             if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Waste Not", this.abuff)){  //checks if the ability is a buff giver
@@ -241,7 +264,7 @@ class Ability {
             
             //reduces stack of buff by 1
             
-            cbuffs[tempIndex][1] --;
+            if(!exption){cbuffs[tempIndex][1] --;}exption= true;
             //if buff is consumed or out of stacks -> DELETES it
             if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Veneration", this.abuff)){  //checks if the ability is a buff giver
                 cbuffs.splice(tempIndex, 1);
@@ -255,7 +278,7 @@ class Ability {
             
             //reduces stack of buff by 1
             
-            cbuffs[tempIndex][1] --;
+            if(!exption){cbuffs[tempIndex][1] --;}
             //if buff is consumed or out of stacks -> DELETES it
             if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Innovation", this.abuff)){  //checks if the ability is a buff giver
                 cbuffs.splice(tempIndex, 1);
@@ -269,28 +292,13 @@ class Ability {
             
             //reduces stack of buff by 1
             
-            cbuffs[tempIndex][1] --;
+            if(!exption){cbuffs[tempIndex][1] --;}
             //if buff is consumed or out of stacks -> DELETES it
             if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Great Strides", this.abuff) || this.quality>0){  //checks if the ability is a buff giver
                 cbuffs.splice(tempIndex, 1);
             }  
         }
-        //Final Appraisal
-        if(this.xsearchBuffs("Final Appraisal", cbuffs)[0]){
-            tempIndex = this.xsearchBuffs("Final Appraisal", cbuffs)[1];
-            //modifier
-            if(currentProgress+this.progress*modifierProgress>=maxProgress){
-                modifierProgress = -(currentProgress-maxProgress+1)/this.progress;
-            }
-            
-            //reduces stack of buff by 1
-            
-            cbuffs[tempIndex][1] --;
-            //if buff is consumed or out of stacks -> DELETES it
-            if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Final Appraisal", this.abuff) || this.progress>0){  //checks if the ability is a buff giver
-                cbuffs.splice(tempIndex, 1);
-            }  
-        }
+        
         //Manipulation
         if(this.xsearchBuffs("Manipulation", cbuffs)[0]){
             tempIndex = this.xsearchBuffs("Manipulation", cbuffs)[1];
@@ -298,7 +306,7 @@ class Ability {
             manipulation = 5;
             //reduces stack of buff by 1
             
-            cbuffs[tempIndex][1] --;
+            if(!exption){cbuffs[tempIndex][1] --;}
             //if buff is consumed or out of stacks -> DELETES it
             //console.log(this.abuff);
             if(cbuffs[tempIndex][1] <= 0 || this.searchABuff("Manipulation", this.abuff)){  //checks if the ability is a buff giver
@@ -377,6 +385,7 @@ class Ability {
                     "ability Durability: ",this.durability, "Durability Modifier", modifierDurability, "manipulation: ", manipulation, "total added Progress", this.durability*modifierDurability+manipulation, "\n",
                     "ability Cp: ", this.cp);
         // console.log(" currentProgress: ",currentProgress, " quality: ",this.quality, " modifierProgress: ", modifierProgress," added prog ", Math.floor(this.progress*modifierProgress));
+        
         return [currentCP-(this.cp-combo), currentDurability-this.durability*modifierDurability+manipulation, currentQuality+Math.floor(this.quality*modifierQuality*modifierInnerQuiet*byregot), currentProgress+Math.floor(this.progress*modifierProgress), buffs];
     }
 
