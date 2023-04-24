@@ -576,30 +576,47 @@ function useAbilityInCraft(abilityID){
 
 function test(){
     abilities = setAbilities();
+    var outputMacro = "";
     for (let i = 0; i < playerMacroNum.length; i++) {
         useAbilityInCraft(playerMacroNum[i]);
+        outputMacro += "/ac \"" + abilities[playerMacroNum[i]].name;
+        if(abilities[playerMacroNum[i]].progress>0 || abilities[playerMacroNum[i]].quality>0){
+            outputMacro += "\" <wait.3>" + "\n"
+        }else{
+            outputMacro += "\" <wait.2>" + "\n"
+        }
     }
+    console.log("huh");
+    console.log(outputMacro);
+    document.getElementById("craftMacroOut").value = outputMacro;
+    // const para = document.createElement("textarea");
+    // const node = document.createTextNode("tt");
+    // para.appendChild(node);
+    // const element = document.getElementById("macroID");
+    // element.appendChild(para);
 
-   /* useAbilityInCraft(3);
-    useAbilityInCraft(29);
-    useAbilityInCraft(24);
-    useAbilityInCraft(28);
-    useAbilityInCraft(6);
-    useAbilityInCraft(27);
-    useAbilityInCraft(6);
-    useAbilityInCraft(26);
-    useAbilityInCraft(16);
-    useAbilityInCraft(16);
-    useAbilityInCraft(16);
-    useAbilityInCraft(16);
-    useAbilityInCraft(25);
-    useAbilityInCraft(26);
-    useAbilityInCraft(12);
-    useAbilityInCraft(6);*/
+    // useAbilityInCraft(3);
+    // useAbilityInCraft(29);
+    // useAbilityInCraft(24);
+    // useAbilityInCraft(28);
+    // useAbilityInCraft(6);
+    // useAbilityInCraft(27);
+    // useAbilityInCraft(6);
+    // useAbilityInCraft(26);
+    // useAbilityInCraft(16);
+    // useAbilityInCraft(16);
+    // useAbilityInCraft(16);
+    // useAbilityInCraft(16);
+    // useAbilityInCraft(25);
+    // useAbilityInCraft(26);
+    // useAbilityInCraft(12);
+    // useAbilityInCraft(6);
 
     // useAbilityInCraft(9);
     // useAbilityInCraft(11);
     // useAbilityInCraft(18);
+
+
 }
 
 

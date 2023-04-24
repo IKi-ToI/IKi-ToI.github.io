@@ -49,3 +49,10 @@
 #playerMacroInport{
     height: 150px;
 }
+.macro{
+    display: flex;
+    flex-direction: row;
+}
+.macro > div {
+    padding-left: 20px;
+}
