@@ -64,6 +64,10 @@ class Ability {
             if(this.searchCondition("InnerQuiet") && !this.searchBuffs("InnerQuiet", craftBuffs)){
                 return this.name +" can only be used if 'Inner Quiet' is active";
             }
+            //checks for Inner Quiet
+            if(this.searchCondition("InnerQuiet10") && !this.searchBuffs("InnerQuiet", craftBuffs)){
+                return this.name +" can only be used if 'Inner Quiet' is active";
+            }
 
         } else{
             
@@ -94,7 +98,11 @@ class Ability {
                     return this.name +" is and RNG skill and not Supported yet";
                 }
                 //checks for Inner Quiet
-                if(this.condition.toLowerCase() === "innerquiet".toLowerCase() && !this.searchBuffs("InnerQuiet", craftBuffs)){
+                if(this.condition.toLowerCase() === "innerquiet10".toLowerCase() && !this.searchBuffs("InnerQuiet", craftBuffs)){
+                    return this.name +" can only be used if 'Inner Quiet' is active";
+                }
+                //checks for Inner Quiet
+                if(this.condition.toLowerCase() === "innerquiet10".toLowerCase() && !this.searchBuffs("InnerQuiet", craftBuffs)){
                     return this.name +" can only be used if 'Inner Quiet' is active";
                 }
             }
@@ -395,9 +403,9 @@ class Ability {
 /*-------------------------------------------*/
 /*---------------GETTING VALUES--------------*/
 //get gud
-var playerProgress = 236;
-var playerQuality = 253;
-var playerCPMax = 581;
+var playerProgress = 318;
+var playerQuality = 380;
+var playerCPMax = 594;
 var playerCP = playerCPMax;
 
 
@@ -438,9 +446,7 @@ function setPlayerStat(cp){
 
 //gets craft Stats
 function getCraftStats(){
-    craftProgressMax = parseInt(document.getElementById("cprogress").value);
-    craftQualityMax =  parseInt(document.getElementById("cquality").value);
-    craftDurabilityMax =  parseInt(document.getElementById("cdurability").value);
+    
     if(craftProgressMax<=0){
         updateLog("progress must be greater then 0");
         return;
@@ -453,6 +459,9 @@ function getCraftStats(){
         updateLog("Durability must be greater then 0");
         return;
     }
+    craftProgressMax = parseInt(document.getElementById("cprogress").value);
+    craftQualityMax =  parseInt(document.getElementById("cquality").value);
+    craftDurabilityMax =  parseInt(document.getElementById("cdurability").value);
     setCraftStats(craftProgressMax,craftQualityMax,craftDurabilityMax);
 
     updateLog("progress saved: "+ craftProgressMax);
@@ -509,7 +518,7 @@ function setAbilities(){
     const prudent_Touch = new Ability("Prudent Touch", 0, playerQuality, 5, 25, ["not Waste Not"], ["InnerQuiet"]); //14
     const reflect = new Ability("Reflect", 0, playerQuality, 10, 6, "start", ["InnerQuiet", "InnerQuiet"]);//15
     const preparatory_Touch = new Ability("Preparatory Touch", 0, playerQuality *2, 20, 40, false, ["InnerQuiet", "InnerQuiet"]); //16
-    const trained_Eye = new Ability("Trained Eye", 0, playerQuality *2000000, 10, 250, "Start", "maxQuality"); //17
+    const trained_Eye = new Ability("Trained Eye", 0, playerQuality *2000000, 10, 250, ["RNG","start"], "maxQuality"); //17
     const advanced_Touch = new Ability("Advanced Touch", 0, playerQuality *1.5, 10, 46, "touch combo2", ["InnerQuiet"]);//18
     const trained_Finesse = new Ability("Trained Finesse", 0, playerQuality *1.5, 0, 32, "InnerQuiet10", false);    //19
 
@@ -536,13 +545,16 @@ function setAbilities(){
 /*---------------CRAFTING--------------*/
 /*-------------------------------------*/
 /*---------------CRAFTING--------------*/
-var craftProgressMax = 5060;
-var craftQualityMax = 12628;
-var craftDurabilityMax = 70;
+var craftProgressMax = 1550;
+var craftQualityMax = 6800;
+var craftDurabilityMax = 40;
 var craftProgress = 0;
 var craftQuality = 0;
 var craftDurability = craftDurabilityMax;
 var buffs =[["start", -1]];
+var bestAchievedQuality = 0;
+var bestAchievedRotation = [];
+var bestAchievedProgress = 0;
 //const manipulation = new Ability("Manipulation", 50, 150, 5, 96, false, "Manipulation");
 
 function useAbilityInCraft(abilityID){
@@ -574,6 +586,129 @@ function useAbilityInCraft(abilityID){
     breakLineLog();
 }
 
+function checkIfBest(quality, prog, rotation){
+     if(prog<craftProgressMax){
+         return;
+     }
+    if (quality > bestAchievedQuality) {
+        bestAchievedQuality = quality;
+        bestAchievedProgress = prog;
+        bestAchievedRotation = [];
+        console.log(rotation);
+        for (let i = 0; i < rotation.length; i++) {
+            bestAchievedRotation.push(rotation[i]);
+            
+        }
+        
+    }
+
+}
+
+
+
+function testRotation(rotation){
+    for (let i = 0; i < rotation.length; i++) {
+        useAbilityInCraft(rotation[i]);        
+    }
+    checkIfBest(craftQuality, craftProgress,rotation);
+    resetcraft();
+}
+function resetcraft(){
+    playerCP = playerCPMax;
+    craftProgressMax = 1550;
+    craftQualityMax = 6800;
+    craftDurabilityMax = 40;
+    craftProgress = 0;
+    craftQuality = 0;
+    craftDurability = craftDurabilityMax;
+    buffs =[["start", -1]];
+    getCraftStats();
+    updateLog("(----------"+ "end of CRAFT" +"---------)")
+    console.log("(----------", "end of CRAFT" ,"---------)");
+}
+
+function createPopulation(populationSize, macroSize) {
+    population = [];
+    for (let i = 0; i < populationSize; i++) {
+        population.push([]);
+    }
+    for (let i = 0; i < populationSize; i++) {
+
+        for (let j = 0; j < macroSize; j++) {
+            population[i].push(parseInt(Math.random()*30));
+            
+        }
+        
+    }
+    return population
+}
+
+function ga(){
+    population = createPopulation(10,15);
+    for (let i = 0; i < population.length; i++) {
+        testRotation(population[i]);
+    }
+    
+    console.log(population);
+}
+
+// function bruteForce(){
+    
+//     let rotation = [0,0];
+
+//     //for (let i = 0; i < 2; i++) {
+//             //rotation.push(0);
+//         for (let j = 0; j < abilities.length; j++) {
+//             rotation[0] = j;
+//             for (let k = 0; k < abilities.length; k++) {
+//                 rotation[1] = k;
+//                 testRotation(rotation);
+//             }
+            
+            
+            
+//         }
+//     //}
+//     
+// }
+
+// function bruteForceIt(iteration, max, path){
+//     pathI = path;
+//     if(iteration < max){
+//         for (let i = 0; i < abilities.length; i++) {
+//             useAbilityInCraft(i);
+//             if(abilities.useAbility(playerCP, craftDurability, craftProgress, craftProgressMax, buffs)==="craft is already finished"){
+                
+//             }
+//             pathI.push(i);
+//         }
+//         bruteForceIt(iteration+1, max, pathI);
+//     }
+// }
+function solve(){
+    abilities = setAbilities();
+    //bruteForce();
+    ga();
+    outputMacroText(bestAchievedRotation);
+    console.log("we are done");
+    console.log("best quality: ", bestAchievedQuality);
+    console.log("best rotation: ", bestAchievedRotation);
+}
+function outputMacroText(rotation){
+    var outputMacro = "";
+    for (let i = 0; i < rotation.length; i++) {
+        useAbilityInCraft(rotation[i]);
+        outputMacro += "/ac \"" + abilities[rotation[i]].name;
+        if(abilities[rotation[i]].progress>0 || abilities[rotation[i]].quality>0){
+            outputMacro += "\" <wait.3>" + "\n";
+        }else{
+            outputMacro += "\" <wait.2>" + "\n";
+        }
+    }
+    console.log(outputMacro);
+    document.getElementById("craftMacroOut").value = outputMacro;
+}
+
 function test(){
     abilities = setAbilities();
     var outputMacro = "";
@@ -581,9 +716,9 @@ function test(){
         useAbilityInCraft(playerMacroNum[i]);
         outputMacro += "/ac \"" + abilities[playerMacroNum[i]].name;
         if(abilities[playerMacroNum[i]].progress>0 || abilities[playerMacroNum[i]].quality>0){
-            outputMacro += "\" <wait.3>" + "\n"
+            outputMacro += "\" <wait.3>" + "\n";
         }else{
-            outputMacro += "\" <wait.2>" + "\n"
+            outputMacro += "\" <wait.2>" + "\n";
         }
     }
     console.log("huh");
