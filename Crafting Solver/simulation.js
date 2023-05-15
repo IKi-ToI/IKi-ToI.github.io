@@ -321,6 +321,7 @@ class Ability {
                 cbuffs.splice(tempIndex, 1);
             } 
         }
+        
 
         /*adds stuff / works with Ability buff (abuff)*/
 
