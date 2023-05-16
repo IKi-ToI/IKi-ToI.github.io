@@ -633,48 +633,68 @@ function resetcraft(){
 }
 
 function createPopulation(populationSize, macroSize) {
-    population = [];
+    let population = [];
     for (let i = 0; i < populationSize; i++) {
         population.push([]);
     }
     for (let i = 0; i < populationSize; i++) {
 
         for (let j = 0; j < macroSize; j++) {
-            population[i].push(parseInt(Math.random()*30));
+            population[i].push(parseInt(Math.random()*abilities.length));
             
         }
         
     }
-    return population
+    return population;
+}
+
+
+function breed(parents, populationSize, macroSize){
+    let temp = [...parents];
+    let population = [temp.splice(1)]; // keeps best of preveous generation
+    for (let i = 0; i < populationSize-1; i++) {
+        population.push([]);
+    }
+    for (let i = 0; i < populationSize; i++) {
+
+        for (let j = 0; j < macroSize; j++) {
+            population[i].push(parseInt(Math.random()*abilities.length));
+            
+        }
+        
+    }
+    return population;
 }
 
 function getBestIndexe(survivors,scores){
     let sortedScores = [...scores];
     sortedScores.sort();
-    sortedScores.reverse();
+    //sortedScores.reverse();
     let temp = [...scores]
     let sortedIndexe = [];
-   // let usedIndexe = []; //runtime optimisatiion later
+    //let usedIndexe = []; //runtime optimisatiion later
 
     for (let i = 0; i < sortedScores.length; i++) {
         
         if(sortedScores[i]==0){continue;}
         console.log("not0 ");
         for (let j = 0; j < temp.length; j++) {
+           
             if(scores[j]==0){continue;}
-                if(sortedScores[i]==temp[j]){
-                    console.log("did we get here", j);
-                    sortedIndexe.push(j);
-                   // temp.splice(j,1);
-                }
-            
-            
+            if(sortedScores[i]==temp[j]){
+                console.log("did we get here", j);
+                sortedIndexe.push(j);
+                // temp.splice(j,1);
+            }
 
         }
         
     }
+    console.log("sorted scores: ", sortedScores);
     return sortedIndexe.length > survivors?sortedIndexe.splice(survivors):sortedIndexe;
 }
+
+
 
 function ga(){
     var rotationScore = [];
