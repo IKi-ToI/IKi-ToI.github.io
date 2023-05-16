@@ -588,7 +588,7 @@ function useAbilityInCraft(abilityID){
 
 function checkIfBest(quality, prog, rotation){
      if(prog<craftProgressMax){
-         return;
+         return 0;
      }
     if (quality > bestAchievedQuality) {
         bestAchievedQuality = quality;
@@ -601,8 +601,10 @@ function checkIfBest(quality, prog, rotation){
         }
         
     }
-
+    return quality;
 }
+
+
 
 
 
@@ -610,8 +612,11 @@ function testRotation(rotation){
     for (let i = 0; i < rotation.length; i++) {
         useAbilityInCraft(rotation[i]);        
     }
-    checkIfBest(craftQuality, craftProgress,rotation);
-    resetcraft();
+    let score = checkIfBest(craftQuality, craftProgress,rotation);
+    
+     resetcraft();
+    
+    return score;
 }
 function resetcraft(){
     playerCP = playerCPMax;
@@ -643,12 +648,42 @@ function createPopulation(populationSize, macroSize) {
     return population
 }
 
+function getBestIndexe(survivors,scores){
+    let sortedScores = [...scores];
+    sortedScores.sort();
+    sortedScores.reverse();
+    let temp = [...scores]
+    let sortedIndexe = [];
+   // let usedIndexe = []; //runtime optimisatiion later
+
+    for (let i = 0; i < sortedScores.length; i++) {
+        
+        if(sortedScores[i]==0){continue;}
+        console.log("not0 ");
+        for (let j = 0; j < temp.length; j++) {
+            if(scores[j]==0){continue;}
+                if(sortedScores[i]==temp[j]){
+                    console.log("did we get here", j);
+                    sortedIndexe.push(j);
+                   // temp.splice(j,1);
+                }
+            
+            
+
+        }
+        
+    }
+    return sortedIndexe.length > survivors?sortedIndexe.splice(survivors):sortedIndexe;
+}
+
 function ga(){
+    var rotationScore = [];
     population = createPopulation(10,15);
     for (let i = 0; i < population.length; i++) {
-        testRotation(population[i]);
+        rotationScore.push(testRotation(population[i]));
     }
-    
+    console.log("index array", getBestIndexe(5,rotationScore));
+    console.log(rotationScore);
     console.log(population);
 }
 
