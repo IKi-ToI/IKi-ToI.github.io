@@ -764,6 +764,7 @@ function outputMacroText(rotation){
     document.getElementById("craftMacroOut").value = outputMacro;
 }
 
+
 function test(){
     abilities = setAbilities();
     var outputMacro = "";
