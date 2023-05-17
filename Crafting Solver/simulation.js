@@ -650,17 +650,20 @@ function createPopulation(populationSize, macroSize) {
 
 
 function breed(parents, populationSize, macroSize){
-    let temp = [...parents];
-    let population = [temp.splice(1)]; // keeps best of preveous generation
-    for (let i = 0; i < populationSize-1; i++) {
-        population.push([]);
-    }
-    for (let i = 0; i < populationSize; i++) {
 
-        for (let j = 0; j < macroSize; j++) {
-            population[i].push(parseInt(Math.random()*abilities.length));
+    let population = [[...bestAchievedRotation]]; // keeps best of preveous generation
+    
+    for (let i = 1; i < populationSize; i++) {
+        population.push([parents[parseInt(Math.random()*parents.length)]]);
+    }
+    for (let i = 1; i < populationSize; i++) {
+        let rndAbility = parseInt(Math.random()*abilities.length);
+        let rndPosInMacro = parseInt(Math.random()*macroSize);
+        population[i][rndPosInMacro] = rndAbility;
+        // for (let j = 0; j < macroSize; j++) {
+        //     population[i].push(parseInt(Math.random()*abilities.length));
             
-        }
+        // }
         
     }
     return population;
@@ -668,8 +671,13 @@ function breed(parents, populationSize, macroSize){
 
 function getBestIndexe(survivors,scores){
     let sortedScores = [...scores];
-    sortedScores.sort();
-    //sortedScores.reverse();
+    //sorts array
+    sortedScores.sort( function( a , b){
+        if(a > b) return 1;
+        if(a < b) return -1;
+        return 0;
+    });
+    sortedScores.reverse();
     let temp = [...scores]
     let sortedIndexe = [];
     //let usedIndexe = []; //runtime optimisatiion later
@@ -677,12 +685,10 @@ function getBestIndexe(survivors,scores){
     for (let i = 0; i < sortedScores.length; i++) {
         
         if(sortedScores[i]==0){continue;}
-        console.log("not0 ");
+        
         for (let j = 0; j < temp.length; j++) {
-           
             if(scores[j]==0){continue;}
             if(sortedScores[i]==temp[j]){
-                console.log("did we get here", j);
                 sortedIndexe.push(j);
                 // temp.splice(j,1);
             }
@@ -691,64 +697,46 @@ function getBestIndexe(survivors,scores){
         
     }
     console.log("sorted scores: ", sortedScores);
+
+    //return rotations.splice(sortedIndexe.length > survivors? survivors:sortedIndexe.length);
+
     return sortedIndexe.length > survivors?sortedIndexe.splice(survivors):sortedIndexe;
 }
 
+function getBestOfGenration(indexOfBest, rotation){
+    let bestRotation = [];
+    for (let i = 0; i < indexOfBest.length; i++) {
+        bestRotation.push(rotation[indexOfBest[i]]);
+    }
+    return bestRotation;
+}
 
 
 function ga(){
     var rotationScore = [];
-    population = createPopulation(10,15);
+    var population = createPopulation(10,15);
     for (let i = 0; i < population.length; i++) {
         rotationScore.push(testRotation(population[i]));
     }
-    console.log("index array", getBestIndexe(5,rotationScore));
-    console.log(rotationScore);
-    console.log(population);
+    let bestIndex = getBestIndexe(5,rotationScore);
+    let parrent = getBestOfGenration(bestIndex,population);
+    console.log("best array", parrent);
+    console.log("new Gen: ", breed(parrent, 10, 15)); 
+    
+    console.log("rotation Score: ", rotationScore);
+    console.log("population: ", population);
 }
 
-// function bruteForce(){
-    
-//     let rotation = [0,0];
-
-//     //for (let i = 0; i < 2; i++) {
-//             //rotation.push(0);
-//         for (let j = 0; j < abilities.length; j++) {
-//             rotation[0] = j;
-//             for (let k = 0; k < abilities.length; k++) {
-//                 rotation[1] = k;
-//                 testRotation(rotation);
-//             }
-            
-            
-            
-//         }
-//     //}
-//     
-// }
-
-// function bruteForceIt(iteration, max, path){
-//     pathI = path;
-//     if(iteration < max){
-//         for (let i = 0; i < abilities.length; i++) {
-//             useAbilityInCraft(i);
-//             if(abilities.useAbility(playerCP, craftDurability, craftProgress, craftProgressMax, buffs)==="craft is already finished"){
-                
-//             }
-//             pathI.push(i);
-//         }
-//         bruteForceIt(iteration+1, max, pathI);
-//     }
-// }
 function solve(){
     abilities = setAbilities();
-    //bruteForce();
+
     ga();
     outputMacroText(bestAchievedRotation);
     console.log("we are done");
     console.log("best quality: ", bestAchievedQuality);
     console.log("best rotation: ", bestAchievedRotation);
 }
+
 function outputMacroText(rotation){
     var outputMacro = "";
     for (let i = 0; i < rotation.length; i++) {
