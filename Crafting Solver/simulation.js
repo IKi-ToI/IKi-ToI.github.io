@@ -555,6 +555,7 @@ var buffs =[["start", -1]];
 var bestAchievedQuality = 0;
 var bestAchievedRotation = [];
 var bestAchievedProgress = 0;
+let bestRotationOfGeneration = [];
 //const manipulation = new Ability("Manipulation", 50, 150, 5, 96, false, "Manipulation");
 
 function useAbilityInCraft(abilityID){
@@ -587,7 +588,7 @@ function useAbilityInCraft(abilityID){
 }
 
 function checkIfBest(quality, prog, rotation){
-    console.log("best rotation?=", rotation);
+    //console.log("best rotation?=", rotation);
      if(prog<craftProgressMax){
          return 0;
      }
@@ -611,7 +612,7 @@ function testRotation(rotation){
     for (let i = 0; i < rotation.length; i++) {
         useAbilityInCraft(rotation[i]);        
     }
-    console.log("test rotation : ",rotation);
+    //console.log("test rotation : ",rotation);
     let score = checkIfBest(craftQuality, craftProgress,rotation);
     
      resetcraft();
@@ -629,7 +630,7 @@ function resetcraft(){
     buffs =[["start", -1]];
     getCraftStats();
     updateLog("(----------"+ "end of CRAFT" +"---------)")
-    console.log("(----------", "end of CRAFT" ,"---------)");
+    //console.log("(----------", "end of CRAFT" ,"---------)");
 }
 
 function createPopulation(populationSize, macroSize) {
@@ -652,12 +653,12 @@ function createPopulation(populationSize, macroSize) {
 function breed(parents, populationSize, macroSize){
 
     let nextGen = [[...bestAchievedRotation]]; // keeps best of preveous generation
-    console.log("best achieved rotation: ", bestAchievedRotation);
-    console.log("parrents: ",parents);
+    //console.log("best achieved rotation: ", bestAchievedRotation);
+    //console.log("parrents: ",parents[0]);
     for (let i = 1; i < populationSize; i++) {
-        nextGen.push(parents[parseInt(Math.random()*parents.length)]);
+        nextGen.push([...parents[parseInt(Math.random()*parents.length)]]);
     }
-    console.log("empty population: ",nextGen);
+    //console.log("empty population: ",nextGen);
     for (let i = 1; i < populationSize; i++) {
         let rndAbility = parseInt(Math.random()*abilities.length);
         let rndPosInMacro = parseInt(Math.random()*macroSize);
@@ -678,11 +679,12 @@ function breed(parents, populationSize, macroSize){
 function getBestIndexe(survivors,scores){
     let sortedScores = [...scores];
     //sorts array
-    sortedScores.sort( function( a , b){
-        if(a > b) return 1;
-        if(a < b) return -1;
-        return 0;
-    });
+    sortedScores.sort((a, b) => 1*a - 1*b);
+    // sortedScores.sort( function( a , b){
+    //     if(a > b) return 1;
+    //     if(a < b) return -1;
+    //     return 0;
+    // });
     sortedScores.reverse();
     let temp = [...scores]
     let sortedIndexe = [];
@@ -712,50 +714,50 @@ function getBestIndexe(survivors,scores){
 function getBestOfGenration(indexOfBest, rotation){
     let bestRotation = [];
     for (let i = 0; i < indexOfBest.length; i++) {
-        bestRotation.push(rotation[indexOfBest[i]]);
+        bestRotation.push(cloneArray(rotation[indexOfBest[i]]));
     }
     return bestRotation;
 }
 
+function cloneArray(a) {
+    return [...a];
+}   
 
 function ga(generationAmmount){
     var rotationScore = [];
+    //creates random Population
     var gen1 = createPopulation(10,15);
-    console.log("population: ", gen1);
-    for (let i = 0; i < gen1.length; i++) {
-        console.log(i , gen1[i]);
-        
-    }
-    console.log("gen1 : ", gen1);
-    for (let i = 0; i < gen1.length; i++) {
-        console.log(i , gen1[i]);
-        
-    }
+    //console.log("population: ", gen1);
+
     for (let k = 0; k < generationAmmount; k++) {
     
         for (let i = 0; i < gen1.length; i++) {
-            console.log("generated poopuilation given: ",gen1[i]);
+            //console.log("generated poopuilation given: ",gen1[i]);
             rotationScore.push(testRotation(gen1[i]));
         }
         let bestIndex = getBestIndexe(5,rotationScore);
         let parrent = getBestOfGenration(bestIndex,gen1);
-        console.log("best indexe", bestIndex);
-        console.log("best array", parrent);
-        console.log("before breed", gen1);
-        console.log("new Gen: ", breed(parrent, 10, 15)); 
-        console.log("after breed: ", gen1);
+        bestRotationOfGeneration.push(cloneArray(parrent[0]));
+        gen1 = breed(parrent, 10, 15);
+        // console.log("best indexe", bestIndex);
+        // console.log("best array", parrent);
+        // console.log("before breed");
+        // console.table(gen1);
+        // console.log("new Gen: "); 
+        // console.table(breed(parrent, 10, 15)); 
+        // console.log("after breed: ", gen1);
         rotationScore = [];
     }
     
     console.log("population: ", gen1);
     console.log("rotation Score: ", rotationScore);
-    
+    console.log("best of Gen: ", bestRotationOfGeneration);
 }
 
 function solve(){
     abilities = setAbilities();
 
-    ga(1);
+    ga(5);
     outputMacroText(bestAchievedRotation);
     console.log("we are done");
     console.log("best quality: ", bestAchievedQuality);
